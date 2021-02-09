@@ -1,0 +1,50 @@
+﻿<div class="container-fluid">
+    <div class="row">
+        <div class="col">
+            Date
+        </div>
+        <div class="col">
+            @DateTime.Now.ToLongDateString();
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            Temperature C
+        </div>
+        <div class="col">
+            0 deg C
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            Temperature C
+        </div>
+        <div class="col">
+            32 deg F
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            Summary
+        </div>
+        <div class="col">
+            Another Beast-from-the-East day
+        </div>
+    </div>
+    <div class="row">
+        @*<div class="col-10 text-right">
+            <button class="btn @this.DirtyButtonCss" @onclick="() => SetDirty()">@this.DirtyButtonText</button>
+        </div>
+        <div class="col-2 text-right">
+            @if (this.DirtyExit)
+            {
+                <button class="btn btn-danger" @onclick="() => DirtyHide()">Dirty Close</button>
+                <button class="btn btn-dark" @onclick="() => CancelHide()">Cancel</button>
+            }
+            else
+            {
+                <button class="btn btn-secondary" @onclick="() => Hide()">Close</button>
+            }
+        </div>*@
+    </div>
+</div>

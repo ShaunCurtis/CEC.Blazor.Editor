@@ -1,0 +1,30 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30804.86
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CEC.Blazor.Editor", "CEC.Blazor.Editor\CEC.Blazor.Editor.csproj", "{015D69DE-057E-4891-96A7-DF4480C13978}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6F690B6B-2F31-457F-97C4-B67E11CD4ACC}"
+	ProjectSection(SolutionItems) = preProject
+		Modal-Editor.md = Modal-Editor.md
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{015D69DE-057E-4891-96A7-DF4480C13978}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{015D69DE-057E-4891-96A7-DF4480C13978}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{015D69DE-057E-4891-96A7-DF4480C13978}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{015D69DE-057E-4891-96A7-DF4480C13978}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {ED9F5BA4-6617-4983-BFA5-C48EA3B80DBA}
+	EndGlobalSection
+EndGlobal

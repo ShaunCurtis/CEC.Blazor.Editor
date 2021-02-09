@@ -1,0 +1,46 @@
+﻿@if (this.Display)
+{
+    <div class="modal-background">
+        <div class="modal-content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col">
+                        Date
+                    </div>
+                    <div class="col">
+                        @DateTime.Now.ToLongDateString();
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        Temperature C
+                    </div>
+                    <div class="col">
+                        0 deg C
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        Temperature F
+                    </div>
+                    <div class="col">
+                        32 deg F
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        Summary
+                    </div>
+                    <div class="col">
+                        Another Beast-from-the-East day
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 text-right">
+                        <button class="btn btn-secondary" @onclick="() => Hide()">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
