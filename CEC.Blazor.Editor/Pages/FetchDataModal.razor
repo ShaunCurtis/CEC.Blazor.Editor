@@ -1,7 +1,6 @@
-﻿@page "/fetchdata"
+﻿@page "/fetchdatamodal"
 
 @using CEC.Blazor.Editor.Data
-@inject WeatherForecastService ForecastService
 
 <h1>Weather forecast</h1>
 
@@ -25,24 +24,17 @@ else
         <tbody>
             @foreach (var forecast in forecasts)
             {
-                <tr>
-                    <td>@forecast.Date.ToShortDateString()</td>
-                    <td>@forecast.TemperatureC</td>
-                    <td>@forecast.TemperatureF</td>
-                    <td>@forecast.Summary</td>
-                </tr>
+            <tr>
+                <td>@forecast.Date.ToShortDateString()</td>
+                <td>@forecast.TemperatureC</td>
+                <td>@forecast.TemperatureF</td>
+                <td>@forecast.Summary</td>
+                <td><button class="btn btn-secondary" @onclick="() => ShowViewDialog()">View</button></td>
+                <td><button class="btn btn-primary" @onclick="() => ShowEditDialog()">Edit</button></td>
+            </tr>
             }
         </tbody>
     </table>
 }
 
-
-@code {
-
-    private WeatherForecast[] forecasts;
-
-    protected override async Task OnInitializedAsync()
-    {
-        forecasts = await ForecastService.GetForecastAsync(DateTime.Now);
-    }
-}
+<ModalDialog @ref="this.Modal"></ModalDialog>

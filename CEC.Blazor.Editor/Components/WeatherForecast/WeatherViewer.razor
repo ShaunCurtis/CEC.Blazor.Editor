@@ -1,0 +1,48 @@
+﻿@namespace CEC.Blazor.Editor
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col">
+            <h2>Weather Viewer</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            Date
+        </div>
+        <div class="col">
+            @DateTime.Now.ToLongDateString()
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            Temperature C
+        </div>
+        <div class="col">
+            0 deg C
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            Temperature C
+        </div>
+        <div class="col">
+            32 deg F
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            Summary
+        </div>
+        <div class="col">
+            Another Beast-from-the-East day
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-10 text-right">
+        </div>
+        <div class="col-2 text-right">
+            <button class="btn btn-secondary" @onclick="() => Exit()">Exit</button>
+        </div>
+    </div>
+</div>

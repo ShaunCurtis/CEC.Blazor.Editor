@@ -1,0 +1,13 @@
+﻿@namespace CEC.Blazor.Editor
+@implements IModalDialog
+
+@if (this.Display)
+{
+<CascadingValue Value="(IModalDialog)this">
+    <div class="modal-background">
+        <div class="modal-content" style="@this.Width">
+            @this._Content
+        </div>
+    </div>
+</CascadingValue>
+}
