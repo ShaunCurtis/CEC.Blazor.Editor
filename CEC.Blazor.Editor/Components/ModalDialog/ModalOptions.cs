@@ -9,6 +9,7 @@ namespace CEC.Blazor.Editor
         /// List of options
         /// </summary>
         public static readonly string __Width = "Width";
+        public static readonly string __ID = "ID";
 
         private Dictionary<string, object> Parameters { get; } = new Dictionary<string, object>();
 
