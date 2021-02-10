@@ -12,6 +12,12 @@ All the NetCore 3.1 solutions I've come across were cludges in one shape or anot
 
 What I cover in this article is my latest approach to the problem.  It's not perfect, but I don't think we will ever get a near perfect solution until we get some new browser standards allowing a switch to *SPA* mode and control over toolbar navigation.
 
+![Dirty Page](https://raw.githubusercontent.com/ShaunCurtis/CEC.Blazor.Editor/master/images/Dirty-Dialog.png?token=AF6NT3LJWA6SOY4PXWNGWHLAEPYC4)
+
+## Code Repository
+
+The code is availabel here at Gitub - [CEC.Blazor.Editor](https://github.com/ShaunCurtis/CEC.Blazor.Editor)
+
 ## Controlling SPA Navigation
 
 The first challenge - How do you stop the user accessing any of the button/links navigation stuff on a standard page?
@@ -24,7 +30,7 @@ The first challenge - How do you stop the user accessing any of the button/links
 
 This article walks you through some **Experimental** code to demonstate what I'm doing in detail.  To follow this, rather than just pasively read this article, strike up a out-of-the-box Blazor Server application in Visual Studio.  In the code samples below my project is called `CEC.Blazor.Editor`.
 
-> **Experimental** code in definitely not production ready. There's almost no error checking, blah, blah,...  It's miminalist to try and preserve clarity.
+> Most of this code is **Experimental** - definitely not production ready. There's almost no error checking, blah, blah,...  It's miminalist to try and preserve clarity.
 
 ## Building the Dialog
 
