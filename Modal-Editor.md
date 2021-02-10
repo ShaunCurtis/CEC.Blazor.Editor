@@ -245,7 +245,7 @@ Run the application and go to *FetchData1*.  Click on an edit button.  All of th
 
 I know there's a fourth, fifth,... (kill the process,hit the power switch,...) but nothing can stop those.
 
-![image](images/FetchData-1-0.png)
+![image](https://raw.githubusercontent.com/ShaunCurtis/CEC.Blazor.Editor/master/images/FetchData-1-0.png?token=AF6NT3O6GBXYO4M2LGHKWNTAEPWSG)
 
 ## Version 2
 
@@ -411,7 +411,7 @@ Now run the application.  Click on an edit button.  All of the links on the unde
 3. Clicking anywhere is the browser window does nothing.
  
 
-![image](images/FetchData-2-0.png)
+![image](https://raw.githubusercontent.com/ShaunCurtis/CEC.Blazor.Editor/master/images/FetchData-2-0.png?token=AF6NT3MSOFQPAIKMXLBR2J3AEPWXA)
 
 ## Version 3
 
@@ -660,6 +660,7 @@ namespace CEC.Blazor.Editor
     }
 }
 ```
+
 ## Weather Components
 
 I've shown only `WeatherEditor` here.  `WeatherViewer` is a simpler version with no "Dirty" functionality.  See the Repo for the code.
@@ -709,18 +710,16 @@ The Razor code is the same as we had in the prototype modal dialog.
         </div>
     </div>
     <div class="row">
-        <div class="col-10 text-right">
-            <button class="btn @this.DirtyButtonCss" @onclick="() => SetDirty()">@this.DirtyButtonText</button>
-        </div>
-        <div class="col-2 text-right">
+        <div class="col-12 text-right">
+            <button class="btn @this.DirtyButtonCss mr-1" @onclick="() => SetDirty()">@this.DirtyButtonText</button>
             @if (this.DoDirtyExit)
             {
-                <button class="btn btn-danger" @onclick="() => DirtyExit()">Dirty Close</button>
-                <button class="btn btn-dark" @onclick="() => CancelExit()">Cancel</button>
+                <button class="btn btn-danger mr-1" @onclick="() => DirtyExit()">Dirty Close</button>
+                <button class="btn btn-dark mr-1" @onclick="() => CancelExit()">Cancel</button>
             }
             else
             {
-                <button class="btn btn-secondary" @onclick="() => Exit()">Close</button>
+                <button class="btn btn-secondary mr-1" @onclick="() => Exit()">Close</button>
             }
         </div>
     </div>
@@ -744,7 +743,7 @@ namespace CEC.Blazor.Editor
 
         private bool DoDirtyExit { get; set; }
 
-        private string DirtyButtonCss => this.IsDirty ? "btn-danger" : "btn-success";
+        private string DirtyButtonCss => this.IsDirty ? "btn-warning" : "btn-info";
 
         private string DirtyButtonText => this.IsDirty ? "Set Clean" : "Set Dirty";
 

@@ -38,14 +38,12 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-10 text-right">
-            <button class="btn @this.DirtyButtonCss" @onclick="() => SetDirty()">@this.DirtyButtonText</button>
-        </div>
-        <div class="col-2 text-right">
+        <div class="col-12 text-right">
+            <button class="btn  mr-1 @this.DirtyButtonCss" @onclick="() => SetDirty()">@this.DirtyButtonText</button>
             @if (this.DoDirtyExit)
             {
-                <button class="btn btn-danger" @onclick="() => DirtyExit()">Dirty Close</button>
-                <button class="btn btn-dark" @onclick="() => CancelExit()">Cancel</button>
+                <button class="btn btn-danger mr-1" @onclick="() => DirtyExit()">Dirty Close</button>
+                <button class="btn btn-dark mr-1" @onclick="() => CancelExit()">Cancel</button>
             }
             else
             {

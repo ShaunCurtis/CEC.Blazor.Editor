@@ -12,7 +12,7 @@ namespace CEC.Blazor.Editor
 
         private bool DoDirtyExit { get; set; }
 
-        private string DirtyButtonCss => this.IsDirty ? "btn-danger" : "btn-success";
+        private string DirtyButtonCss => this.IsDirty ? "btn-warning" : "btn-info";
 
         private string DirtyButtonText => this.IsDirty ? "Set Clean" : "Set Dirty";
 
