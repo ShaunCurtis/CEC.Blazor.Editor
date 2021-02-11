@@ -1,0 +1,61 @@
+﻿@namespace CEC.Blazor.Editor
+<UILoader Loaded="this.IsLoaded">
+    <CascadingValue Value="this.EditContext">
+        <UIContainer>
+
+            <UIFormRow>
+                <UIColumn>
+                    <h2>Weather Forecast Editor</h2>
+                </UIColumn>
+            </UIFormRow>
+
+            <UIFormRow>
+                <UILabelColumn>
+                    Date
+                </UILabelColumn>
+                <UIInputColumn Cols="3">
+                    <InputDate class="form-control" @bind-Value="this.RecordEditorContext.Date"></InputDate>
+                </UIInputColumn>
+                <UIColumn Cols="3"></UIColumn>
+                <UIValidationColumn>
+                    <ValidationMessage For=@(() => this.RecordEditorContext.Date) />
+                </UIValidationColumn>
+            </UIFormRow>
+
+            <UIFormRow>
+                <UILabelColumn>
+                    Temperature &deg;C
+                </UILabelColumn>
+                <UIInputColumn Cols="2">
+                    <InputNumber class="form-control" @bind-Value="this.RecordEditorContext.TemperatureC"></InputNumber>
+                </UIInputColumn>
+                <UIColumn Cols="4"></UIColumn>
+                <UIValidationColumn>
+                    <ValidationMessage For=@(() => this.RecordEditorContext.TemperatureC) />
+                </UIValidationColumn>
+            </UIFormRow>
+
+            <UIFormRow>
+                <UILabelColumn>
+                    Summary
+                </UILabelColumn>
+                <UIInputColumn>
+                    <InputText class="form-control" @bind-Value="this.RecordEditorContext.Summary"></InputText>
+                </UIInputColumn>
+                <UIValidationColumn>
+                    <ValidationMessage For=@(() => this.RecordEditorContext.Summary) />
+                </UIValidationColumn>
+            </UIFormRow>
+
+            <UIFormRow>
+                <UIButtonColumn>
+                    <UIButton CssColor="btn-success" Show="this.CanSave" ClickEvent="this.Save">@this.SaveButtonText</UIButton>
+                    <UIButton CssColor="btn-danger" Show="this.IsDirtyExit" ClickEvent="this.DirtyExit">Exit Without Saving</UIButton>
+                    <UIButton CssColor="btn-warning" Show="this.IsDirtyExit" ClickEvent="this.CancelExit">Cancel Exit</UIButton>
+                    <UIButton CssColor="btn-secondary" Show="this.CanExit" ClickEvent="this.Exit">Exit</UIButton>
+                </UIButtonColumn>
+            </UIFormRow>
+
+        </UIContainer>
+    </CascadingValue>
+</UILoader>

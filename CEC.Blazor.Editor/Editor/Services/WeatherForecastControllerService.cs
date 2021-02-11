@@ -36,7 +36,7 @@ namespace CEC.Blazor.Editor
 
         public event EventHandler ListChanged;
 
-        public RecordCollection RecordData { get; }
+        public RecordCollection RecordData { get; } = new RecordCollection();
 
         public WeatherForecastControllerService(WeatherForecastDataService weatherForecastDataService )
         {
@@ -51,10 +51,21 @@ namespace CEC.Blazor.Editor
         public async Task GetForecastAsync(Guid id)
         {
             this.Forecast = await DataService.GetForecastAsync(id);
+            this.RecordChanged?.Invoke(RecordChanged, EventArgs.Empty);
         }
-        public async Task SaveForecastAsync(DbWeatherForecast record)
+
+        public async Task<bool> SaveForecastAsync()
         {
-            await DataService.UpdateForecastAsync(record);
+            Guid id = Guid.Empty;
+            var record = DbWeatherForecast.FromRecordCollection(this.RecordData);
+            if (this.Forecast.ID.Equals(Guid.Empty))
+                 id = await this.DataService.AddForecastAsync(record);
+            else
+              id =  await this.DataService.UpdateForecastAsync(record);
+            if (!id.Equals(Guid.Empty))
+                await GetForecastAsync(id);
+            return !id.Equals(Guid.Empty);
+
         }
     }
 }

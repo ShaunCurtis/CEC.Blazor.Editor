@@ -49,6 +49,8 @@ a, .btn-link {
         top: 0.5rem;
     }
 
+
+    /* Start Modal Dialog CSS */
 div.modal-background {
     display: block;
     position: fixed;
@@ -69,3 +71,6 @@ div.modal-content {
     border: 2px solid #888;
     width: 90%;
 }
+
+/* End Modal Dialog CSS */
+

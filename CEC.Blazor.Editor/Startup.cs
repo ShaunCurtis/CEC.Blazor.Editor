@@ -29,6 +29,8 @@ namespace CEC.Blazor.Editor
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddSingleton<WeatherForecastService>();
+            services.AddSingleton<WeatherForecastDataService>();
+            services.AddScoped<WeatherForecastControllerService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

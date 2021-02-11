@@ -64,7 +64,7 @@ namespace CEC.Blazor.Editor
             if (this.RecordEditorContext.EditContext.Validate())
             {
                 // Save the Record
-                ok = await this.ControllerService.SaveRecordAsync();
+                ok = await this.ControllerService.SaveForecastAsync();
                 if (ok)
                 {
                     // Set the EditContext State
@@ -72,12 +72,8 @@ namespace CEC.Blazor.Editor
                     // Set the View Lock i.e. unlock it
                     this.SetLock();
                 }
-                // Set the alert message to the return result
-                this.AlertMessage.SetAlert(this.Service.TaskResult);
-                // Trigger a component State update - buttons and alert need to be sorted
-                await RenderAsync();
+                await this.InvokeAsync(StateHasChanged);
             }
-            else this.AlertMessage.SetAlert("A validation error occurred.  Check individual fields for the relevant error.", MessageType.Danger);
             return ok;
         }
 

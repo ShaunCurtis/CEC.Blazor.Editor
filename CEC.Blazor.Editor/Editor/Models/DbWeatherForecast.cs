@@ -1,20 +1,21 @@
+
 using System;
 
 namespace CEC.Blazor.Editor
 {
     public class DbWeatherForecast
     {
-        public static RecordValue __ID = new RecordValue() { FieldName = "ID", DisplayName = "ID" };
-        public static RecordValue __Date = new RecordValue() { FieldName = "Date", DisplayName = "Forecast Date" };
-        public static RecordValue __TemperatureC = new RecordValue() { FieldName = "TemperatureC", DisplayName = "Temperature C" };
-        public static RecordValue __TemperatureF = new RecordValue() { FieldName = "TemperatureF", DisplayName = "Temperature F", ReadOnly = true };
-        public static RecordValue __Summary = new RecordValue() { FieldName = "Summary", DisplayName = "Summary" };
+        public static RecordFieldValue __ID = new RecordFieldValue() { FieldName = "ID", DisplayName = "ID" };
+        public static RecordFieldValue __Date = new RecordFieldValue() { FieldName = "Date", DisplayName = "Forecast Date" };
+        public static RecordFieldValue __TemperatureC = new RecordFieldValue() { FieldName = "TemperatureC", DisplayName = "Temperature C" };
+        public static RecordFieldValue __TemperatureF = new RecordFieldValue() { FieldName = "TemperatureF", DisplayName = "Temperature F", ReadOnly = true };
+        public static RecordFieldValue __Summary = new RecordFieldValue() { FieldName = "Summary", DisplayName = "Summary" };
 
-        public Guid ID { get; init; } = Guid.NewGuid();
+        public Guid ID { get; init; } = Guid.Empty;
 
-        public DateTime Date { get; init; }
+        public DateTime Date { get; init; } = DateTime.Now;
 
-        public int TemperatureC { get; init; }
+        public int TemperatureC { get; init; } = 25;
 
         public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
 

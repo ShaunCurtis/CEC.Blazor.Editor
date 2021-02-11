@@ -1,0 +1,22 @@
+﻿@namespace CEC.Blazor.Editor
+
+@if (this.Show)
+{
+    <button class="btn mr-1 @this.CssColor" @onclick="ButtonClick">
+        @this.ChildContent
+    </button>
+}
+
+@code {
+
+    [Parameter] public bool Show { get; set; } = true;
+
+    [Parameter] public EventCallback<MouseEventArgs> ClickEvent { get; set; }
+
+    [Parameter] public string CssColor { get; set; } = "btn-primary";
+
+    [Parameter] public RenderFragment ChildContent { get; set; }
+
+    protected void ButtonClick(MouseEventArgs e) => this.ClickEvent.InvokeAsync(e);
+
+}

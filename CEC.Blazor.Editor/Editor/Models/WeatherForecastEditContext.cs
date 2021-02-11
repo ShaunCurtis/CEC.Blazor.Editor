@@ -39,7 +39,7 @@ namespace CEC.Blazor.Editor
             }
         }
 
-        public decimal TemperatureC
+        public int TemperatureC
         {
             get => this.RecordValues.GetEditValue<int>(DbWeatherForecast.__TemperatureC.FieldName);
             set
@@ -76,7 +76,7 @@ namespace CEC.Blazor.Editor
         private bool ValidateSummary()
         {
             return this.Summary.Validation(DbWeatherForecast.__Summary.FieldName, this, ValidationMessageStore)
-                .LongerThan(3, "Your description needs to be a little longer! 4 letters minimum")
+                .LongerThan(2, "Your description needs to be a little longer! 3 letters minimum")
                 .Validate();
         }
         private bool ValidateDate()

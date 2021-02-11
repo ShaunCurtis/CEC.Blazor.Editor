@@ -2,13 +2,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace CEC.Blazor.Editor
 {
-    public class RecordCollection :IEnumerable<RecordValue>
+    public class RecordCollection :IEnumerable<RecordFieldValue>
     {
-        private List<RecordValue> _items = new List<RecordValue>();
+        private List<RecordFieldValue> _items = new List<RecordFieldValue>();
 
         public int Count => _items.Count;
 
@@ -16,7 +15,7 @@ namespace CEC.Blazor.Editor
 
         public bool IsDirty => _items.Any(item => item.IsDirty);
 
-        public IEnumerator<RecordValue> GetEnumerator()
+        public IEnumerator<RecordFieldValue> GetEnumerator()
         {
             foreach (var item in _items)
                 yield return item;
@@ -31,7 +30,7 @@ namespace CEC.Blazor.Editor
         public void Clear()
             => _items.Clear();
 
-        public void AddRange(List<RecordValue> list, bool clearList)
+        public void AddRange(List<RecordFieldValue> list, bool clearList)
         {
             if (clearList) _items.Clear();
             list.ForEach(item => this._items.Add(item));
@@ -58,12 +57,12 @@ namespace CEC.Blazor.Editor
             return default;
         }
 
-        public RecordValue GetRecordValue(string FieldName)
+        public RecordFieldValue GetRecordValue(string FieldName)
         {
             var x = _items.FirstOrDefault(item => item.FieldName.Equals(FieldName, StringComparison.CurrentCultureIgnoreCase));
             if (x == default)
             {
-                x = new RecordValue(FieldName, null);
+                x = new RecordFieldValue(FieldName, null);
                 _items.Add(x);
             }
             return x;
@@ -100,11 +99,11 @@ namespace CEC.Blazor.Editor
                 x.EditedValue = value;
                 this.FieldValueChanged?.Invoke(this.IsDirty);
             }
-            else _items.Add(new RecordValue(FieldName, value));
+            else _items.Add(new RecordFieldValue(FieldName, value));
             return true;
         }
 
-        public bool Add(RecordValue record, bool overwrite = true)
+        public bool Add(RecordFieldValue record, bool overwrite = true)
         {
             var x = _items.FirstOrDefault(item => item.FieldName.Equals(record.FieldName, StringComparison.CurrentCultureIgnoreCase));
             if (x != null && x != default)
@@ -129,7 +128,7 @@ namespace CEC.Blazor.Editor
         {
             var x = _items.FirstOrDefault(item => item.FieldName.Equals(FieldName, StringComparison.CurrentCultureIgnoreCase));
             if (x != null && x != default) _items.Remove(x);
-            _items.Add(new RecordValue(FieldName, value));
+            _items.Add(new RecordFieldValue(FieldName, value));
             return true;
         }
 

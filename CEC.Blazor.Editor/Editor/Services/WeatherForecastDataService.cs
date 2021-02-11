@@ -26,38 +26,44 @@ namespace CEC.Blazor.Editor
             {
                 Forecasts.Add(new DbWeatherForecast
                 {
+                    ID = Guid.NewGuid(),
                     Date = DateTime.Now.AddDays((double)x),
                     TemperatureC = rng.Next(-20, 55),
                     Summary = Summaries[rng.Next(Summaries.Length)]
-                });
+                }); 
             }
         }
 
         public Task<List<DbWeatherForecast>> GetForecastsAsync()
-        {
-            return Task.FromResult(this.Forecasts);
-        }
+            => Task.FromResult(this.Forecasts);
 
         public Task<DbWeatherForecast> GetForecastAsync(Guid id)
-        {
-            return Task.FromResult(this.Forecasts.FirstOrDefault(item => item.ID.Equals(id)));
-        }
+            => Task.FromResult(this.Forecasts.FirstOrDefault(item => item.ID.Equals(id)));
 
-        public Task<bool> UpdateForecastAsync(DbWeatherForecast record)
+        public Task<Guid> UpdateForecastAsync(DbWeatherForecast record)
         {
             var rec = this.Forecasts.FirstOrDefault(item => item.ID.Equals(record.ID));
             if (rec != default) this.Forecasts.Remove(rec);
-            this.Forecasts.Add(rec);
-            return Task.FromResult(true);
+            this.Forecasts.Add(record);
+            return Task.FromResult(record.ID);
         }
 
-        public Task<bool> AddForecastAsync(DbWeatherForecast record)
+        public Task<Guid> AddForecastAsync(DbWeatherForecast record)
         {
-            var rec = this.Forecasts.FirstOrDefault(item => item.ID.Equals(record.ID));
-            if (rec != default) return Task.FromResult(false);
-            this.Forecasts.Add(rec);
-            return Task.FromResult(true);
+            var id = Guid.NewGuid();
+            if (record.ID.Equals(Guid.Empty))
+            {
+                var recdata = record.AsRecordCollection;
+                recdata.SetField(DbWeatherForecast.__ID.FieldName, id);
+                record = DbWeatherForecast.FromRecordCollection(recdata);
+            }
+            else
+            {
+                var rec = this.Forecasts.FirstOrDefault(item => item.ID.Equals(record.ID));
+                if (rec != default) return Task.FromResult(Guid.Empty);
+            }
+            this.Forecasts.Add(record);
+            return Task.FromResult(id);
         }
-
     }
 }

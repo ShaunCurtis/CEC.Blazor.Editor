@@ -1,0 +1,11 @@
+﻿@namespace CEC.Blazor.Editor
+
+<div class="container-fluid">
+    @this.ChildContent
+</div>
+
+@code {
+
+    [Parameter] public RenderFragment ChildContent { get; set; }
+
+}

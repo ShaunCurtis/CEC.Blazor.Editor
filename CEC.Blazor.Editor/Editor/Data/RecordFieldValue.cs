@@ -7,17 +7,25 @@ using System;
 
 namespace CEC.Blazor.Editor
 {
-    public class RecordValue
+    public class RecordFieldValue
     {
         public string FieldName { get; init; }
-
-        public Guid GUID { get; init; } = Guid.NewGuid();
 
         public object Value { get; init; }
 
         public bool ReadOnly { get; init; }
 
-        public object EditedValue { get; set; }
+        public object EditedValue
+        {
+            get
+            {
+                if (this._EditedValue is null && this.Value != null) this._EditedValue = this.Value;
+                return this._EditedValue;
+            }
+            set => this._EditedValue = value;
+        }
+
+        private object _EditedValue { get; set; }
 
         public string DisplayName { get; set; }
 
@@ -31,22 +39,21 @@ namespace CEC.Blazor.Editor
             }
         }
 
-        public RecordValue() { }
+        public RecordFieldValue() { }
 
-        public RecordValue(string field, object value)
+        public RecordFieldValue(string field, object value)
         {
             this.FieldName = field;
             this.Value = value;
             this.EditedValue = value;
-            this.GUID = Guid.NewGuid();
         }
 
         public void Reset()
             => this.EditedValue = this.Value;
 
-        public RecordValue Clone()
+        public RecordFieldValue Clone()
         {
-            return new RecordValue()
+            return new RecordFieldValue()
             {
                 DisplayName = this.DisplayName,
                 FieldName = this.FieldName,
@@ -55,9 +62,9 @@ namespace CEC.Blazor.Editor
             };
         }
 
-        public RecordValue Clone(object value)
+        public RecordFieldValue Clone(object value)
         {
-            return new RecordValue()
+            return new RecordFieldValue()
             {
                 DisplayName = this.DisplayName,
                 FieldName = this.FieldName,
