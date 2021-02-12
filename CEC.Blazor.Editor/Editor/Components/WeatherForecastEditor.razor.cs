@@ -7,18 +7,15 @@ namespace CEC.Blazor.Editor
 {
     public partial class WeatherForecastEditor : ComponentBase
     {
-        public EditContext EditContext
-        {
-            get => _EditContext;
-        }
+        public EditContext EditContext => _EditContext;
+
         private EditContext _EditContext = null;
 
         protected WeatherForecastEditContext RecordEditorContext { get; set; }
 
         [Inject] protected WeatherForecastControllerService ControllerService { get; set; }
 
-        [CascadingParameter]
-        private IModalDialog Modal { get; set; }
+        [CascadingParameter] private IModalDialog Modal { get; set; }
         
         private bool IsModal => this.Modal != null;
 
@@ -34,12 +31,14 @@ namespace CEC.Blazor.Editor
 
         private bool CanExit => !this.IsDirtyExit;
 
+        private bool HasServices => this.IsModal && this.ControllerService != null;
+
         private string SaveButtonText => this.ControllerService.Forecast.ID.Equals(Guid.Empty) ? "Save" : "Update";
 
         protected async override Task OnInitializedAsync()
         {
-            await Task.Yield();
-            if (this.IsModal && Modal.Options.TryGet<Guid>(ModalOptions.__ID, out Guid modalid))
+            //await Task.Yield();
+            if (this.HasServices && Modal.Options.TryGet<Guid>(ModalOptions.__ID, out Guid modalid))
             {
                 await this.ControllerService.GetForecastAsync(modalid);
                 this.RecordEditorContext = new WeatherForecastEditContext(this.ControllerService.RecordData);
@@ -50,29 +49,17 @@ namespace CEC.Blazor.Editor
             await base.OnInitializedAsync();
         }
 
-        protected override void OnAfterRender(bool firstRender)
-        {
-            base.OnAfterRender(firstRender);
-        }
-
         protected void OnFieldChanged(object sender, EventArgs e)
-        {
-            this.SetLock();
-            this.IsDirtyExit = false;
-            InvokeAsync(StateHasChanged);
-        }
+            => this.SetLock();
 
         private void SetLock()
         {
+            this.IsDirtyExit = false;
             if (this.RecordEditorContext.IsDirty)
                 this.Modal.Lock(true);
             else
                 this.Modal.Lock(false);
-        }
-
-        protected override Task OnParametersSetAsync()
-        {
-            return base.OnParametersSetAsync();
+            InvokeAsync(StateHasChanged);
         }
 
         protected async Task<bool> Save()
@@ -89,9 +76,7 @@ namespace CEC.Blazor.Editor
                     this.RecordEditorContext.EditContext.MarkAsUnmodified();
                     // Set the View Lock i.e. unlock it
                     this.SetLock();
-                    this.IsDirtyExit = false;
                 }
-                await this.InvokeAsync(StateHasChanged);
             }
             return ok;
         }
@@ -114,10 +99,7 @@ namespace CEC.Blazor.Editor
         }
 
         protected void CancelExit()
-        {
-                this.IsDirtyExit = false;
-                this.InvokeAsync(StateHasChanged);
-        }
+            => SetLock();
 
     }
 }

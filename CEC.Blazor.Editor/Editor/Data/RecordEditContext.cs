@@ -69,7 +69,21 @@ namespace CEC.Blazor.Editor
         /// <returns>True if valid</returns>
         public bool Validate()
         {
-            ValidationRequested(this, ValidationRequestedEventArgs.Empty);
+            // using Validating to stop being called multiple times
+            if (this.ValidationMessageStore != null && !this.Validating)
+            {
+                this.Validating = true;
+                // clear the message store and trip wire and check we have Validators to run
+                this.ValidationMessageStore.Clear();
+                this.Trip = false;
+                foreach (var validator in this.ValidationActions)
+                {
+                    // invoke the action - defined as a func<bool> and trip if validation failed (false)
+                    if (!validator.Invoke()) this.Trip = true;
+                }
+                this.EditContext.NotifyValidationStateChanged();
+                this.Validating = false;
+            }
             return IsValid;
         }
 
@@ -87,19 +101,19 @@ namespace CEC.Blazor.Editor
             // if we already have an edit context, we will have registered with OnValidationRequested, so we need to drop it before losing our reference to the editcontext object.
             if (this.EditContext != null)
             {
-                EditContext.OnValidationRequested -= ValidationRequested;
+                this.EditContext.OnValidationRequested -= ValidationRequested;
             }
             // assign the Edit Context internally
             this.EditContext = context;
             if (this.IsLoaded)
             {
                 // Get the Validation Message Store from the EditContext
-                ValidationMessageStore = new ValidationMessageStore(EditContext);
+                this.ValidationMessageStore = new ValidationMessageStore(EditContext);
                 // Wire up to the Editcontext to service Validation Requests
-                EditContext.OnValidationRequested += ValidationRequested;
+                this.EditContext.OnValidationRequested += ValidationRequested;
             }
             // Call a validation on the current data set
-            Validate();
+            this.Validate();
             return Task.CompletedTask;
         }
 
@@ -126,21 +140,7 @@ namespace CEC.Blazor.Editor
 
         private void ValidationRequested(object sender, ValidationRequestedEventArgs args)
         {
-            // using Validating to stop being called multiple times
-            if (ValidationMessageStore != null && !this.Validating)
-            {
-                this.Validating = true;
-                // clear the message store and trip wire and check we have Validators to run
-                this.ValidationMessageStore.Clear();
-                this.Trip = false;
-                foreach (var validator in this.ValidationActions)
-                {
-                    // invoke the action - defined as a func<bool> and trip if validation failed (false)
-                    if (!validator.Invoke()) this.Trip = true;
-                }
-                EditContext.NotifyValidationStateChanged();
-                this.Validating = false;
-            }
+            this.Validate();
         }
 
         #endregion

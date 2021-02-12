@@ -4,6 +4,8 @@
 
 @namespace CEC.Blazor.Editor.Pages
 
+<ModalDialog @ref="this.Modal"></ModalDialog>
+
 <h1>Weather forecast</h1>
 
 <p>This component demonstrates fetching data from a service.</p>
@@ -40,5 +42,3 @@ else
         </tbody>
     </table>
 }
-
-<ModalDialog @ref="this.Modal"></ModalDialog>

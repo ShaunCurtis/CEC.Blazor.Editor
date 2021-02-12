@@ -8,6 +8,24 @@ using System.Text.RegularExpressions;
 
 namespace CEC.Blazor.Editor
 {
+    public static class StringValidatorExtensions
+    {
+        /// <summary>
+        /// String Validation Extension
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="fieldName"></param>
+        /// <param name="model"></param>
+        /// <param name="validationMessageStore"></param>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        public static StringValidator Validation(this string value, string fieldName, object model, ValidationMessageStore validationMessageStore, string message = null)
+        {
+            var validation = new StringValidator(value, fieldName, model, validationMessageStore, message);
+            return validation;
+        }
+    }
+
     public class StringValidator : Validator<string>
     {
         #region Public
@@ -71,26 +89,5 @@ namespace CEC.Blazor.Editor
         }
 
         #endregion
-
-        #region Private
-        #endregion
-    }
-
-    public static class StringValidatorExtensions
-    {
-        /// <summary>
-        /// String Validation Extension
-        /// </summary>
-        /// <param name="value"></param>
-        /// <param name="fieldName"></param>
-        /// <param name="model"></param>
-        /// <param name="validationMessageStore"></param>
-        /// <param name="message"></param>
-        /// <returns></returns>
-        public static StringValidator Validation(this string value, string fieldName, object model, ValidationMessageStore validationMessageStore, string message = null)
-        {
-            var validation = new StringValidator(value, fieldName, model, validationMessageStore, message);
-            return validation;
-        }
     }
 }
