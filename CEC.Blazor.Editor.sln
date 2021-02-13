@@ -12,6 +12,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		readme.md = readme.md
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CEC.Blazor.ModalEditor", "CEC.Blazor.ModalEditor\CEC.Blazor.ModalEditor.csproj", "{CD1AAD2D-CDDE-47BD-BD1C-FFB03E983A57}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -22,6 +24,10 @@ Global
 		{015D69DE-057E-4891-96A7-DF4480C13978}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{015D69DE-057E-4891-96A7-DF4480C13978}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{015D69DE-057E-4891-96A7-DF4480C13978}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CD1AAD2D-CDDE-47BD-BD1C-FFB03E983A57}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD1AAD2D-CDDE-47BD-BD1C-FFB03E983A57}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD1AAD2D-CDDE-47BD-BD1C-FFB03E983A57}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD1AAD2D-CDDE-47BD-BD1C-FFB03E983A57}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,14 +1,14 @@
 # Building an Editor Framework
 
-This is the second of a pair of articles looking at how to implement edit form control in Blazor.
+This is the second of two articles looking at how to implement edit form controls in Blazor.
 
-The first article explores how to control what the user could do once a form was dirty - how to stop a user unintentionally exiting.  This article describes building a framework to detect when the dataset is dirty and/or invalid.
+The first article explores how to control what the user could do once a form was dirty; in essence how to stop a user unintentionally exiting.  This article describes how to build a framework that detects when the dataset is dirty and/or invalid.
 
-I think many would consider that Blazor already has all the functionality you need to edit data.  Why do you need to re-invent the wheel?  It's a valid question.  If you fervently believe its true, read no further: this article isn't for you.
+I think many would consider that Blazor already has all the functionality needed to edit data.  Why do you need to re-invent the wheel?  It's a valid question, and you answer depends on the environment you work in.  If you fervently believe its true, read no further: this article isn't for you.
 
-A little recent background. C# 9 introduced the `Record` type, creating an immutable reference type.  The property `{get; init;}` lets us create an immutable property.  These are recent language changes: Microsoft seems to have doing a little rethinking about data editing!
+A little recent background. C# 9 introduced the `Record` type, creating an immutable reference type.  The property `{get; init;}` lets us create an immutable property.  These are recent language changes: Microsoft seem to have done a little rethinking!
 
-I've always been a firm believer in maintaining the integrity of records and recordsets read from databases.  What you see in your reference record or recordset is what is in the database.  If you want to edit something, make a copy, change the copy, submit the copy back to the database and refresh your reference copy from the database.
+I've always been a firm believer in maintaining the integrity of records and recordsets read from databases.  What you see in your reference record or recordset is what is in the database.  If you want to edit something, make a copy, change the copy, submit the copy to the database and then refresh your reference copy from the database.
 
 The editing framework I use, described in this article, implements those principles.
 
@@ -16,7 +16,7 @@ The editing framework I use, described in this article, implements those princip
 
 This short discussion and the example project uses the out-of-the-box Blazor WeatherForecast record as the reference point.
 
-The `DbWeatherForecast` class represents the record read from the database.  It's declared as a `class`, not a `record`: only the properties that represent the database fields are immutable. The editable version of   `DbWeatherForecast` is held in a `RecordCollection`.  `DbWeatherForecast` has methods to build and read data from a `RecordCollection`.  A `RecordCollection` is an `IEnumerable` object containing a list of `RecordFieldValue` objects.  Each represents a field/property in `DbWeatherForecast`.  A `RecordFieldValue` has a set of immutable fields itself, `Value` and `FieldName` and an `EditedValue` field which can be set.  `IsDirty` is a boolean property that represents the edit state of `RecordFieldValue`. `RecordCollection` and `RecordFieldValue` provide controlled access to the underlying data values.
+`DbWeatherForecast` represents the record read from the database.  It's declared as a `class`, not a `record`: only the properties that represent database fields are immutable. The editable version of   `DbWeatherForecast` is held in a `RecordCollection`.  `DbWeatherForecast` has methods to build and read data from a `RecordCollection`.  A `RecordCollection` is an `IEnumerable` object containing a list of `RecordFieldValue` objects.  Each represents a field/property in `DbWeatherForecast`.  A `RecordFieldValue` has a set of immutable fields itself, `Value` and `FieldName`, and an `EditedValue` field which can be set.  `IsDirty` is a boolean property that represents the edit state of `RecordFieldValue`. `RecordCollection` and `RecordFieldValue` provide controlled access to the underlying data values.
 
 `WeatherForecastEditContext` is the UI editor object for `DbWeatherForecast`, exposing the editable properties of the `RecordCollection` for `DbWeatherForecast`.  It has a symbiotic relationship with the `EditContext`, tracking the edit state of the `RecordCollection` and providing validation of any properties that require data validation.
 
@@ -541,6 +541,54 @@ Again simple, but it keeps the high level declaration minimal.
 <UIButton CssColor="btn-success" Show="this.CanSave" ClickEvent="this.Save">@this.SaveButtonText</UIButton>
 ```
 
+#### ModalEditForm
+
+We replace `EditForm` with `ModalEditForm`.  It:
+
+1. Has three RenderFragments.  
+2. `LoadingContent` is only shown whilst the form is loading. 
+2. `EditorContent` is shown once loading is complete.  It cascades `EditContext`.
+3. `ButtonContent` is always shown at the bottom of the control.
+5. `Loaded` controls what gets rendered.
+6. We build the control with `BuildRenderTree`.
+
+```c#
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Components.Rendering;
+
+namespace CEC.Blazor.ModalEditor
+{
+    public class ModalEditForm : ComponentBase
+    {
+        [Parameter] public RenderFragment EditorContent { get; set; }
+        [Parameter] public RenderFragment ButtonContent { get; set; }
+        [Parameter] public RenderFragment LoadingContent { get; set; }
+        [Parameter] public bool Loaded { get; set; }
+        [Parameter] public EditContext EditContext {get; set;}
+
+        protected override void BuildRenderTree(RenderTreeBuilder builder)
+        {
+            if (this.Loaded)
+            {
+                builder.OpenRegion(EditContext.GetHashCode());
+                builder.OpenComponent<CascadingValue<EditContext>>(1);
+                builder.AddAttribute(2, "IsFixed", true);
+                builder.AddAttribute(3, "Value", EditContext);
+                builder.AddAttribute(4, "ChildContent", EditorContent);
+                builder.CloseComponent();
+                builder.CloseRegion();
+            }
+            else
+                builder.AddContent(10, LoadingContent );
+            builder.AddContent(20, ButtonContent);
+        }
+    }
+}
+
+```
+
+
 ### WeatherDataModal
 
 Moving on to the real UI stuff.
@@ -751,73 +799,87 @@ namespace CEC.Blazor.Editor
 
 The markup code is fairly standard editor fare.
 
-1. You can see the use of the UIComponents to standardizt the HTML.
-2. There's no `EditForm`, we don't need it.  The `EditContext` is cascaded directly.
-3. `UILoader` only renders it's `ChildContent` when `Loaded` is true. `EditContext` and `RecordEditorContext` aren't used until they are up and configured.
-4. The buttons use the various boolean Properties to control their display state.
+1. You can see the use of the UIComponents to standardize the HTML.
+2. `EditForm` is replaved by `ModalEditForm`.  It ensures stuff isn't rendered until it's loaded and cascades the `EditContext`.
+3. The buttons use the various boolean Properties to control their display state.
 
 ```html
-@namespace CEC.Blazor.Editor
-<UILoader Loaded="this.IsLoaded">
-    <CascadingValue Value="this.EditContext">
-        <UIContainer>
+@namespace CEC.Blazor.ModalEditor
+    <UIContainer>
 
-            <UIFormRow>
-                <UIColumn>
-                    <h2>Weather Forecast Editor</h2>
-                </UIColumn>
-            </UIFormRow>
+        <UIFormRow>
+            <UIColumn>
+                <h2>Weather Forecast Editor</h2>
+            </UIColumn>
+        </UIFormRow>
+    
+    </UIContainer>
 
-            <UIFormRow>
-                <UILabelColumn>
-                    Date
-                </UILabelColumn>
-                <UIInputColumn Cols="3">
-                    <InputDate class="form-control" @bind-Value="this.RecordEditorContext.Date"></InputDate>
-                </UIInputColumn>
-                <UIColumn Cols="3"></UIColumn>
-                <UIValidationColumn>
-                    <ValidationMessage For=@(() => this.RecordEditorContext.Date) />
-                </UIValidationColumn>
-            </UIFormRow>
+    <ModalEditForm EditContext="this.EditContext" Loaded="this.IsLoaded">
+        <LoadingContent>
+            ... loading
+        </LoadingContent>
+        <EditorContent>
 
-            <UIFormRow>
-                <UILabelColumn>
-                    Temperature &deg;C
-                </UILabelColumn>
-                <UIInputColumn Cols="2">
-                    <InputNumber class="form-control" @bind-Value="this.RecordEditorContext.TemperatureC"></InputNumber>
-                </UIInputColumn>
-                <UIColumn Cols="4"></UIColumn>
-                <UIValidationColumn>
-                    <ValidationMessage For=@(() => this.RecordEditorContext.TemperatureC) />
-                </UIValidationColumn>
-            </UIFormRow>
+            <UIContainer>
+                <UIFormRow>
+                    <UILabelColumn>
+                        Date
+                    </UILabelColumn>
+                    <UIInputColumn Cols="3">
+                        <InputDate class="form-control" @bind-Value="this.RecordEditorContext.Date"></InputDate>
+                    </UIInputColumn>
+                    <UIColumn Cols="3"></UIColumn>
+                    <UIValidationColumn>
+                        <ValidationMessage For=@(() => this.RecordEditorContext.Date) />
+                    </UIValidationColumn>
+                </UIFormRow>
 
-            <UIFormRow>
-                <UILabelColumn>
-                    Summary
-                </UILabelColumn>
-                <UIInputColumn>
-                    <InputText class="form-control" @bind-Value="this.RecordEditorContext.Summary"></InputText>
-                </UIInputColumn>
-                <UIValidationColumn>
-                    <ValidationMessage For=@(() => this.RecordEditorContext.Summary) />
-                </UIValidationColumn>
-            </UIFormRow>
+                <UIFormRow>
+                    <UILabelColumn>
+                        Temperature &deg;C
+                    </UILabelColumn>
+                    <UIInputColumn Cols="2">
+                        <InputNumber class="form-control" @bind-Value="this.RecordEditorContext.TemperatureC"></InputNumber>
+                    </UIInputColumn>
+                    <UIColumn Cols="4"></UIColumn>
+                    <UIValidationColumn>
+                        <ValidationMessage For=@(() => this.RecordEditorContext.TemperatureC) />
+                    </UIValidationColumn>
+                </UIFormRow>
 
-            <UIFormRow>
-                <UIButtonColumn>
-                    <UIButton CssColor="btn-success" Show="this.CanSave" ClickEvent="this.Save">@this.SaveButtonText</UIButton>
-                    <UIButton CssColor="btn-danger" Show="this.IsDirtyExit" ClickEvent="this.DirtyExit">Exit Without Saving</UIButton>
-                    <UIButton CssColor="btn-warning" Show="this.IsDirtyExit" ClickEvent="this.CancelExit">Cancel Exit</UIButton>
-                    <UIButton CssColor="btn-secondary" Show="this.CanExit" ClickEvent="this.Exit">Exit</UIButton>
-                </UIButtonColumn>
-            </UIFormRow>
+                <UIFormRow>
+                    <UILabelColumn>
+                        Summary
+                    </UILabelColumn>
+                    <UIInputColumn>
+                        <InputText class="form-control" @bind-Value="this.RecordEditorContext.Summary"></InputText>
+                    </UIInputColumn>
+                    <UIValidationColumn>
+                        <ValidationMessage For=@(() => this.RecordEditorContext.Summary) />
+                    </UIValidationColumn>
+                </UIFormRow>
 
-        </UIContainer>
-    </CascadingValue>
-</UILoader>
+            </UIContainer>
+
+        </EditorContent>
+
+        <ButtonContent>
+            <UIContainer>
+
+                <UIFormRow>
+                    <UIButtonColumn>
+                        <UIButton CssColor="btn-success" Show="this.CanSave" ClickEvent="this.Save">@this.SaveButtonText</UIButton>
+                        <UIButton CssColor="btn-danger" Show="this.IsDirtyExit" ClickEvent="this.DirtyExit">Exit Without Saving</UIButton>
+                        <UIButton CssColor="btn-warning" Show="this.IsDirtyExit" ClickEvent="this.CancelExit">Cancel Exit</UIButton>
+                        <UIButton CssColor="btn-secondary" Show="this.CanExit" ClickEvent="this.Exit">Exit</UIButton>
+                    </UIButtonColumn>
+                </UIFormRow>
+
+            </UIContainer>
+
+        </ButtonContent>
+    </ModalEditForm>
 ```
 
 ### WeatherForecastEditorContext
@@ -1021,6 +1083,8 @@ namespace CEC.Blazor.Editor
 
 ### What Makes all this Work?
 
+If you havn't dug through the AspNetCore code on Github how all the edit stuff hangs together can be a little baffling.
+ 
 There's an intrincate set of relationships and links within the edit form components that make all this work.  The net result is a lot of co-ordinated re-rendering of components to display validation problems and the right buttons displayed based on the edit state.
 
 We've covered the intial load process for the form.  `<UILoader Loaded="this.IsLoaded">` controls when the form gets rendered. Once we have a live `EditContext` and interlinked `RecordEditorContext` `IsLoaded` is true.  All the Input controls get rendered and linked into the cascaded `EditContext`.  An initial validation has been run on `RecordEditorContext` as part of `NotifyEditContextChangedAsync`, so the form will display validation messages.
@@ -1102,3 +1166,14 @@ private void SetLock()
 ```
 
 `SetLock` clears `IsDirtyExit` - if we've tried to exit a dirt form and then subsiquently changed a field value then w've cancelled the exit.  We then check if `RecordEditorContext` is dirty.  In our case it is so we lock the browser window.  We finally render the control which sorts out the buttons.  Note that if we had already edited the value once and then changed it back to the original, `RecordEditorContext` would be clean.  You could exit and the *Update* button would dissappear.
+
+### WeatherForecast Viewer
+
+I won't go into detail.  You can review the code in the Repo to see how it's put together.  It's a simple version of the editor, accessing the controller service record directly for it's data, and using a custom `InputReadOnlyText` component to display values.
+
+## Wrap Up
+
+Much of the infrastructure I've put together here is simplistic.  The services and data records would make greater use of interfaces and core abstract classes to provide abstraction and implement boilerplate code.  A set of articles - [Building a Database Application](https://www.codeproject.com/Articles/5279560/Building-a-Database-Application-in-Blazor-Part-1-P)-  covers such a framework in more detail.  Note the current article set is based on my NetCore 3.1 4 month old Framework and will be revised over the next week.
+
+
+What I've covered here is a methodology for editing records.  It's not for everybody.  It depends on your mindset on data, and the environment you have to work in.  If nothing more, I hope it provokes you to question how you view and deal with data.

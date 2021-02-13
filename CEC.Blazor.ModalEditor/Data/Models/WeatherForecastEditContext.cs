@@ -5,7 +5,7 @@
 
 using System;
 
-namespace CEC.Blazor.Editor
+namespace CEC.Blazor.ModalEditor
 {
 
     /// <summary>
@@ -18,7 +18,7 @@ namespace CEC.Blazor.Editor
     {
         #region Public
 
-        public bool IsNew => this.RecordValues.Get<Guid>(DbWeatherForecast.__ID.FieldName).Equals(Guid.Empty);
+        public override bool IsNew => this.RecordValues.Get<Guid>(DbWeatherForecast.__ID.FieldName).Equals(Guid.Empty);
 
         public DateTime Date
         {

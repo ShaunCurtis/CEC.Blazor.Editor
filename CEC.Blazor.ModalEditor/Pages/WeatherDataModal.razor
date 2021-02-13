@@ -1,0 +1,42 @@
+﻿@page "/weatherdatamodal"
+
+@namespace CEC.Blazor.ModalEditor.Pages
+
+<ModalDialog @ref="this.Modal"></ModalDialog>
+
+<h1>Weather forecast</h1>
+
+<p>This component demonstrates fetching data from a service.</p>
+
+@if (this.ForecastService.Forecasts == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Temp. (C)</th>
+                <th>Temp. (F)</th>
+                <th>Summary</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var forecast in this.ForecastService.Forecasts)
+            {
+                <tr>
+                    <td>@forecast.Date.ToShortDateString()</td>
+                    <td>@forecast.TemperatureC</td>
+                    <td>@forecast.TemperatureF</td>
+                    <td>@forecast.Summary</td>
+                    <td class="text-right">
+                        <button class="btn btn-sm btn-secondary" @onclick="() => ShowViewDialog(forecast.ID)">View</button>
+                        <button class="btn btn-sm btn-primary" @onclick="() => ShowEditDialog(forecast.ID)">Edit</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
