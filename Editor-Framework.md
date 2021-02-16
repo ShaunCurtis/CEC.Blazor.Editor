@@ -24,7 +24,7 @@ In the project `WeatherForecastControllerService` is the business object that pr
 
 ## Sample Code
 
-As always there's a GitHub Repo . 
+As always there's a GitHub Repo [CEC.Blazor.Editor](https://github.com/ShaunCurtis/CEC.Blazor.Editor).  CEC.Blazor.ModalEditor is the project for this article. 
 
 ## Infrastructure Classes
 
