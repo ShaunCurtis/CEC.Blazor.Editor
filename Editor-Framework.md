@@ -1,22 +1,25 @@
-# Building an Editor Framework
+# Building a Blazor Editor Framework
 
 This is the second of two articles looking at how to implement edit form controls in Blazor.
 
 The first article explored how to control what the user could do once a form was dirty; in essence how to stop a user unintentionally exiting.  This article describes how to build a framework that detects when the dataset is dirty and/or invalid and "locks" the application.
 
-Many probably consider that Blazor already has enough functionality for edit data.  Why do you need to re-invent the wheel is a valid question?  If you fervently believe this is true, read no further: this article isn't for you.  If not then read on and manke your own decision.
+Many probably consider that Blazor already has enough functionality for edit data.  Why do you need to re-invent the wheel is a valid question?  If you fervently believe this is true, read no further: this article isn't for you.  If not then read on and make your own decision.
 
 A little recent background. C# 9 introduced the `Record` type, creating an immutable reference type.  The property `{get; init;}` lets us create an immutable property.  These are recent language changes: Microsoft seems to have done a little rethinking!
 
-I'm a firm believer in maintaining the integrity of records and recordsets read from databases.  What you see in your reference record or recordset is what is in the database.  If you want to edit something, there's a process, not just change the original.  Make a copy, change the copy, submit the copy to the database and then refresh your reference data from the database.
+I'm a firm believer in maintaining the integrity of records and recordsets read from databases.  What you see in your reference record or recordset is what is in the database.  If you want to edit something, there's a process, don't just wade in and change the original.  Make a copy, change the copy, submit the copy to the database and then refresh your reference data from the database.
 
 The editing framework I use, described in this article, implements those principles.
+
+![Dirty Page](https://raw.githubusercontent.com/ShaunCurtis/CEC.Blazor.Editor/master/images/Dirty-Editor.png)
+
 
 ## Overview
 
 This short discussion and the project uses the out-of-the-box Blazor WeatherForecast record as our example.
 
-`DbWeatherForecast` represents the record read from the database.  It's declared as a `class`, not a `record`: only the properties that represent database fields are immutable. The editable version of   `DbWeatherForecast` is held in a `RecordCollection`.  `DbWeatherForecast` has methods to build and read data from a `RecordCollection`.  A `RecordCollection` is an `IEnumerable` object containing a list of `RecordFieldValue` objects.  Each represents a field/property in `DbWeatherForecast`.  A `RecordFieldValue` has a set of immutable fields itself, `Value` and `FieldName`, and an `EditedValue` field which can be set.  `IsDirty` is a boolean property that represents the edit state of `RecordFieldValue`. The `RecordCollection` and `RecordFieldValue` classes provide controlled access to the underlying data values.
+`DbWeatherForecast` represents the record read from the database.  It's declared as a `class`, not a `record`: only properties that represent database fields are immutable. The editable version of   `DbWeatherForecast` is held in a `RecordCollection`.  `DbWeatherForecast` has methods to build and read data from a `RecordCollection`.  A `RecordCollection` is an `IEnumerable` object containing a list of `RecordFieldValue` objects.  Each represents a field/property in `DbWeatherForecast`.  A `RecordFieldValue` has its own immutable fields, `Value` and `FieldName`, and an `EditedValue` field which can be set.  `IsDirty` is a boolean property that represents the edit state of `RecordFieldValue`. The `RecordCollection` and `RecordFieldValue` classes provide controlled access to the underlying data values.
 
 `WeatherForecastEditContext` is the UI editor object for `DbWeatherForecast`, exposing the editable properties of the `RecordCollection` for `DbWeatherForecast`.  It has a symbiotic relationship with the `EditContext`, tracking the edit state of the `RecordCollection` and providing validation of any properties that require data validation.
 
@@ -1152,7 +1155,7 @@ public void NotifyFieldChanged(in FieldIdentifier fieldIdentifier)
 }
 ```
 
-The final bit of acrion takes place in the edit form.  The local method `OnFieldChanged` is wired to `EditContext.OnFieldChanged`.
+The final bit of action takes place in the edit form.  The local method `OnFieldChanged` is wired to `EditContext.OnFieldChanged`.
 
 ```c#
 // Code snippet from WeatherForecastEditor.razor.cs
@@ -1181,4 +1184,4 @@ I won't go into detail.  You can review the code in the Repo to see how it's put
 Much of the infrastructure I've put together here is simplistic.  The services and data records should use interfaces and core abstract classes to provide abstraction and implement boilerplate code.  A set of articles - [Building a Database Application](https://www.codeproject.com/Articles/5279560/Building-a-Database-Application-in-Blazor-Part-1-P)-  covers such a framework in more detail.  Note the current article set is based on my NetCore 3.1 four month old framework and will be revised very shortly.
 
 
-What I've covered here is a methodology for editing records.  It's not for everybody.  It depends on your mindset on data, and the environment you have to work in.  If nothing more, I hope it provokes you to think about how you view and deal with data.
+What I've covered here is a methodology for editing records.  It's not for everybody.  It depends on your mindset, and the environment you work in.  If nothing more, I hope it provokes some thought on how you view and deal with data.
