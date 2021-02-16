@@ -2,24 +2,29 @@
 
 This is the second of two articles looking at how to implement edit form controls in Blazor.
 
-The first article explores how to control what the user could do once a form was dirty; in essence how to stop a user unintentionally exiting.  This article describes how to build a framework that detects when the dataset is dirty and/or invalid.
+The first article explored how to control what the user could do once a form was dirty; in essence how to stop a user unintentionally exiting.  This article describes how to build a framework that detects when the dataset is dirty and/or invalid and "locks" the application.
 
-I think many would consider that Blazor already has all the functionality needed to edit data.  Why do you need to re-invent the wheel?  It's a valid question, and you answer depends on the environment you work in.  If you fervently believe its true, read no further: this article isn't for you.
+Many probably consider that Blazor already has enough functionality for edit data.  Why do you need to re-invent the wheel is a valid question?  If you fervently believe this is true, read no further: this article isn't for you.  If not then read on and manke your own decision.
 
-A little recent background. C# 9 introduced the `Record` type, creating an immutable reference type.  The property `{get; init;}` lets us create an immutable property.  These are recent language changes: Microsoft seem to have done a little rethinking!
+A little recent background. C# 9 introduced the `Record` type, creating an immutable reference type.  The property `{get; init;}` lets us create an immutable property.  These are recent language changes: Microsoft seems to have done a little rethinking!
 
-I've always been a firm believer in maintaining the integrity of records and recordsets read from databases.  What you see in your reference record or recordset is what is in the database.  If you want to edit something, make a copy, change the copy, submit the copy to the database and then refresh your reference copy from the database.
+I'm a firm believer in maintaining the integrity of records and recordsets read from databases.  What you see in your reference record or recordset is what is in the database.  If you want to edit something, there's a process, not just change the original.  Make a copy, change the copy, submit the copy to the database and then refresh your reference data from the database.
 
 The editing framework I use, described in this article, implements those principles.
 
 ## Overview
 
-This short discussion and the example project uses the out-of-the-box Blazor WeatherForecast record as the reference point.
+This short discussion and the project uses the out-of-the-box Blazor WeatherForecast record as our example.
 
-`DbWeatherForecast` represents the record read from the database.  It's declared as a `class`, not a `record`: only the properties that represent database fields are immutable. The editable version of   `DbWeatherForecast` is held in a `RecordCollection`.  `DbWeatherForecast` has methods to build and read data from a `RecordCollection`.  A `RecordCollection` is an `IEnumerable` object containing a list of `RecordFieldValue` objects.  Each represents a field/property in `DbWeatherForecast`.  A `RecordFieldValue` has a set of immutable fields itself, `Value` and `FieldName`, and an `EditedValue` field which can be set.  `IsDirty` is a boolean property that represents the edit state of `RecordFieldValue`. `RecordCollection` and `RecordFieldValue` provide controlled access to the underlying data values.
+`DbWeatherForecast` represents the record read from the database.  It's declared as a `class`, not a `record`: only the properties that represent database fields are immutable. The editable version of   `DbWeatherForecast` is held in a `RecordCollection`.  `DbWeatherForecast` has methods to build and read data from a `RecordCollection`.  A `RecordCollection` is an `IEnumerable` object containing a list of `RecordFieldValue` objects.  Each represents a field/property in `DbWeatherForecast`.  A `RecordFieldValue` has a set of immutable fields itself, `Value` and `FieldName`, and an `EditedValue` field which can be set.  `IsDirty` is a boolean property that represents the edit state of `RecordFieldValue`. The `RecordCollection` and `RecordFieldValue` classes provide controlled access to the underlying data values.
 
 `WeatherForecastEditContext` is the UI editor object for `DbWeatherForecast`, exposing the editable properties of the `RecordCollection` for `DbWeatherForecast`.  It has a symbiotic relationship with the `EditContext`, tracking the edit state of the `RecordCollection` and providing validation of any properties that require data validation.
 
+In the project `WeatherForecastControllerService` is the business object that provides access to the WeatherForecast data.  The editor and viewer call `GetForecastAsync(id)` to load the current `DbWeatherForecast` record in `WeatherForecastControllerService`. `RecordData` the `RecordCollection` for the `DbWeatherForecast` record is populated by `GetForecastAsync(id)`.  When the UI initilaizes an instance of `WeatherForecastEditContext` it passes it the `WeatherForecastControllerService` `RecordData` `RecordCollection`.  It's important to note at this point that `RecordData` isn't replaced when a new `DbWeatherForecast` is loaded, it's cleared and then re-populated: the reference passed to `WeatherForecastEditContext` is always valid.
+
+## Sample Code
+
+As always there's a GitHub Repo . 
 
 ## Infrastructure Classes
 
@@ -113,9 +118,9 @@ namespace CEC.Blazor.Editor
 
 `RecordCollection` is a managed `IEnumerable` collection of `RecordFieldValue` objects.  Note:
 
-1. There are lots of getters, setters, etc for getting to the individual `RecordFieldValue` objects.
+1. There are lots of getters, setters, etc for accessing and updating the individual `RecordFieldValue` objects.
 2. `IsDirty` checks for any dirty items in the collection.
-3. `FieldValueChanged` provides a event triggered whenever an individual `RecordFieldValue` is set.  You can see it being invoked when `SetField` is called.
+3. `FieldValueChanged` is an event triggered whenever an individual `RecordFieldValue` is set.  You can see it being invoked when `SetField` is called.
 
 ```c#
 using System;
@@ -177,9 +182,9 @@ namespace CEC.Blazor.Editor
 
 ## RecordEditContext
 
-`RecordEditContext` is the base class for the record edit context.  It contains the boilerplate code.  We'll look at it in more detail when we look at the `WeatherForecastEditContext`.  Key points to note:
+`RecordEditContext` is the base class for the record edit context.  It contains the boilerplate code.  We'll look at it in more detail in `WeatherForecastEditContext`.  Key points to note:
 
-1. It's initiliaiser requires a `RecordCollection` object.  In the app;lication this is the ControllerService `RecordCollection` associated with the current record.  It gets loaded whenever the record getys changed.
+1. It's initiliaiser requires a `RecordCollection` object.  In the application this is the ControllerService `RecordCollection` called `RecordData` associated with the current record.  It gets loaded whenever the record cahnges.
 2. It holds a reference to the valid `EditContext` and expects to be notified of changes.
 3. It handles Validation for the `EditContext` and is wired into `EditContext.OnValidationRequested`.
 4. It holds a List of `ValidationActions` which get run whenever validation is triggered.
@@ -487,7 +492,7 @@ Moving on to the UI and digressing a little.
 
 ### UI Components
 
-One of my gripes with much of the UI code I see is HTML markup repetition.  What coders do in Razor Markup they would never dream of doing in C# code.  Editor/Display/List forms are good examples.  In this project I've moved most of the repetitive HTML markup into *UI Components*.  I like to get all my HTML markup out of high level components.  A formatting issue such as not enough spacing. Fix it in one place and it's fixed everywhere!
+A gripe I have with much of the UI code I see is HTML repetition.  What coders do in Razor Markup they would never dream of doing in C# code.  Editor/Display/List forms are good examples.  I've moved most of the repetitive HTML markup into *UI Components*: in my applications HTML markup doesn't belong in high level components.  A formatting issue such as not enough spacing. Fix it in one place and it's fixed everywhere!
 
 Let's take a look at a couple of examples. All the UI components are in the *UIComponents* directory.
 
@@ -543,12 +548,12 @@ Again simple, but it keeps the high level declaration minimal.
 
 #### ModalEditForm
 
-We replace `EditForm` with `ModalEditForm`.  It:
+`ModalEditForm` replaces `EditForm`.  It:
 
 1. Has three RenderFragments.  
 2. `LoadingContent` is only shown whilst the form is loading. 
-2. `EditorContent` is shown once loading is complete.  It cascades `EditContext`.
-3. `ButtonContent` is always shown at the bottom of the control.
+3. `EditorContent` is shown once loading is complete.  It cascades `EditContext`.
+4. `ButtonContent` is always shown at the bottom of the control.
 5. `Loaded` controls what gets rendered.
 6. We build the control with `BuildRenderTree`.
 
@@ -593,7 +598,7 @@ namespace CEC.Blazor.ModalEditor
 
 Moving on to the real UI stuff.
 
-This replaces `FetchData`.  It's similar.  The `Edit` and `View` buttons now pass the `ID` of the record.
+This replaces `FetchData`.  It's similar.  The `Edit` and `View` buttons now pass the `ID` of the record.  I haven't replaced the HTML with UI controls, so you can see how little has changed.
 ```html
 @page "/weatherdatamodal"
 @using CEC.Blazor.Editor.Data
@@ -643,7 +648,7 @@ In code:
 
 1. We now use the new `WeatherForecastControllerService`, and the Razor markup uses the service `Forecasts` list.
 2. We load the `Forecasts` list in `WeatherForecastControllerService` as part of the form `OnInitializedAsync()`.
-3. The two button handlers create a `ModalOptions` object and add the `ID` to pass into the controls.
+3. The two button handlers create a `ModalOptions` object and add the `ID` to pass into the editor and viewer forms.
 
 ```c#
 using Microsoft.AspNetCore.Components;
@@ -688,11 +693,11 @@ namespace CEC.Blazor.Editor.Pages
 
 ### WeatherForecastEditor
 
-The Editor is the container that sets up all the edit components and then updates the buttons in the UI as things change in the underlying EditContext and RecordEditorContext.  It contains a set of Boolean Properties for controlling the UI and button state.
+The Editor is the container that sets up all the edit components and then updates the buttons in the UI as things change in the underlying EditContext and RecordEditorContext.  A set of Boolean Properties control the UI and button state.
 
 On Initialization it:
 1. Gets the record ID from `ModalOptions`.
-2. Loads the `DbWeatherForecast` record in the controller - which loads `RecordData`, the `RecordCollection` object in the service.
+2. Loads the controller `DbWeatherForecast` - which loads `RecordData`, the `RecordCollection` object in the service.
 3. Creates a new `RecordEditorContext`, passing in the `RecordCollection`.
 4. Creates a `EditContext` with `RecordEditorContext` as the modal.
 5. Notifies `RecordEditorContext` that the `EditContext` has changed.
@@ -800,8 +805,8 @@ namespace CEC.Blazor.Editor
 The markup code is fairly standard editor fare.
 
 1. You can see the use of the UIComponents to standardize the HTML.
-2. `EditForm` is replaved by `ModalEditForm`.  It ensures stuff isn't rendered until it's loaded and cascades the `EditContext`.
-3. The buttons use the various boolean Properties to control their display state.
+2. `EditForm` is replaced by `ModalEditForm`.  It ensures content isn't rendered until it's loaded and cascades the `EditContext`.
+3. The buttons use the various boolean properties to control their display state.
 
 ```html
 @namespace CEC.Blazor.ModalEditor
@@ -885,11 +890,11 @@ The markup code is fairly standard editor fare.
 ### WeatherForecastEditorContext
 
 Note:
-1. The Properties exposing the underlying fields in the `RecordValues`, referenced all the way back to the `RecordCollection` object in the ControllerService.
-2. The Property setters setting the `EditedValue` on the `RecordFieldValue`.
-3. The Property setting calling `Validate` and precipitating the validation process throughout the edit components in the form - turning any control red and displaying any validation messages.
-4. The definition of `Validators` for properties requiring validation.
-5. The validators being loaded through `LoadValidationActions`.
+1. The Properties exposing the underlying fields in `RecordValues`, referenced all the way back to the `RecordCollection` object in the ControllerService.
+2. The Property setters set the `EditedValue` on the `RecordFieldValue`.
+3. The Property setters calling `Validate` and precipitating the validation process throughout the edit components in the form - turning any control red and displaying any validation messages.
+4. `Validators` defined for properties requiring validation.
+5. The validators loaded through `LoadValidationActions`.
 
 ```c#
 using System;
@@ -967,7 +972,7 @@ namespace CEC.Blazor.Editor
 
 ### Validators
 
-We build a custom validation process.  It's not rocket science and once you understand the principles it very flexible.
+`WeatherForecastEditorContext` uses a custom validation process.  It's not rocket science and once you understand the principles it very flexible.
 
 Skip down to the next section to see an implementation first before coming back to the the abstract `Validator` class.  It will make more sense.
 
@@ -1022,9 +1027,9 @@ namespace CEC.Blazor.Editor
 
 #### StringValidator
 
-This is a `Validator` implementation for strings.
+This is a `Validator` for strings.
 
-The key to how validators work is in the static class.  `Validation` is an extension method for `string`.  When you call it on a string it creates a `StringValidator` object and returns it.  You now have a `StringValidator` that you can call a validation method on.  Each validation method returns a reference to the validation object.  You can chain as many as you like together with their specific messages.  You call the base `Validate` method to complete the process.  It logs any validation messages into the `ValidationMessageStore`, and returns true or false.  The `ValidationMessageStore` is linked back to the `EditContext`. 
+The key to validators work is the static class.  `Validation` is an extension method for `string`.  When you call `Validation` on a string it creates a `StringValidator` object and returns it.  You now have a `StringValidator` that you can call a validation method on.  Each validation method returns a reference to the validation object.  You can chain as many as you like together with their specific messages.  You call the base `Validate` method to complete the process.  It logs any validation messages into the `ValidationMessageStore`, and returns true or false.  The `ValidationMessageStore` is linked back to the `EditContext`. 
 
 ```c#
 using Microsoft.AspNetCore.Components.Forms;
@@ -1083,11 +1088,11 @@ namespace CEC.Blazor.Editor
 
 ### What Makes all this Work?
 
-If you havn't dug through the AspNetCore code on Github how all the edit stuff hangs together can be a little baffling.
+If you haven't dug through Microsoft's AspNetCore code on Github investigating how all the edit stuff hangs together, it can be a little baffling.
  
-There's an intrincate set of relationships and links within the edit form components that make all this work.  The net result is a lot of co-ordinated re-rendering of components to display validation problems and the right buttons displayed based on the edit state.
+There's an intrincate set of relationships and links within the edit form components that make all this work.  The net result is a lot of co-ordinated re-rendering of components to display validation problems, and the right buttons displayed at the right time.
 
-We've covered the intial load process for the form.  `<UILoader Loaded="this.IsLoaded">` controls when the form gets rendered. Once we have a live `EditContext` and interlinked `RecordEditorContext` `IsLoaded` is true.  All the Input controls get rendered and linked into the cascaded `EditContext`.  An initial validation has been run on `RecordEditorContext` as part of `NotifyEditContextChangedAsync`, so the form will display validation messages.
+We've covered the intial load process for the form.  `<UILoader Loaded="this.IsLoaded">` controls when the form gets rendered. Once we have a live `EditContext` and interlinked `RecordEditorContext` `IsLoaded` is true.  All the Input controls get rendered and linked into the cascaded `EditContext`.  The first call to `NotifyEditContextChangedAsync` on `RecordEditorContext` runs a validation, so the form will display initial validation messages.
 
 Lets suppose we change the Summary.  Here's the important code snippet from `InputBase`.
 
@@ -1109,11 +1114,11 @@ protected TValue? CurrentValue
 }
 ```
 
-On exiting the Summary edit control, the `InputText` control sets `Value = value` (`Value` is the property value in `RecordEditorContext`), invokes it's own `ValueChanged` event then calls `NotifyFieldChanged` on `EditContext`.  This precipitates two processes.
+On exiting the Summary edit control, the `InputText` control sets `Value = value` (`Value` is the property value in `RecordEditorContext`), invokes it's own `ValueChanged` event, followed by calling `NotifyFieldChanged` on `EditContext`.  This precipitates two processes.
 
 #### RecordEditorContext Property Set
 
-The property set in `RecordEditorContext` sets the `EditedValue` of the `RecordFieldValue` to the new value and then kicks off `Validate` which performs a validation.  The set, `Validate` and subsiquent validations are all synchronous operations.  They complete before `NotifyFieldChanged` is called on `EditContext`.  This is important, the validation process is complete before `EditContext` runs code or kicks off any events.  The last action of `Validate` is to notify the `EditContext` that the Validation State has changed - `this.EditContext.NotifyValidationStateChanged()`. 
+The property set in `RecordEditorContext` sets the `EditedValue` of the `RecordFieldValue` to the new value and then kicks off `Validate` which performs a validation.  Set, `Validate` and subsiquent validations are all synchronous operations.  They complete before `NotifyFieldChanged` is called on `EditContext`.  This is important: the validation process is complete before `EditContext` runs code or kicks off any events.  The last action of `Validate` is to notify the `EditContext` that the Validation State has changed - `this.EditContext.NotifyValidationStateChanged()`. 
 
 ```c#
 // Code snippet from EditContext.cs
@@ -1122,7 +1127,7 @@ public void NotifyValidationStateChanged()
     OnValidationStateChanged?.Invoke(this, ValidationStateChangedEventArgs.Empty);
 }
 ```
-`EditContext` kicks off it's own `OnValidationStateChanged` event.  All the Input controls and `ValidationMessage` instances wire into this event as shown below.  The input controls change their color and render if there's a validation message for their property.  `ValidationMessage` instances look up their relevant message and display it if there is one.    
+`EditContext` kicks off it's own `OnValidationStateChanged` event.  All the Input controls and `ValidationMessage` instances wire into this event as shown below.  The input controls check for a validation message relevant to them and change color and render if there is one.  `ValidationMessage` instances look up their relevant message and display it if they find one.    
 
 ```c#
 public override Task SetParametersAsync(ParameterView parameters)
@@ -1147,7 +1152,7 @@ public void NotifyFieldChanged(in FieldIdentifier fieldIdentifier)
 }
 ```
 
-The last action is in the edit form.  We wired up a local method `OnFieldChanged` to `EditContext.OnFieldChanged`.
+The final bit of acrion takes place in the edit form.  The local method `OnFieldChanged` is wired to `EditContext.OnFieldChanged`.
 
 ```c#
 // Code snippet from WeatherForecastEditor.razor.cs
@@ -1165,7 +1170,7 @@ private void SetLock()
 }
 ```
 
-`SetLock` clears `IsDirtyExit` - if we've tried to exit a dirt form and then subsiquently changed a field value then w've cancelled the exit.  We then check if `RecordEditorContext` is dirty.  In our case it is so we lock the browser window.  We finally render the control which sorts out the buttons.  Note that if we had already edited the value once and then changed it back to the original, `RecordEditorContext` would be clean.  You could exit and the *Update* button would dissappear.
+`SetLock` clears `IsDirtyExit` - set if our action was to try to exit a dirty form.  We then check if `RecordEditorContext` is dirty.  In our case it is so we lock the browser window.  We finally render the control which sorts out the buttons.  Note that if we had already edited the value once and then changed it back to the original, `RecordEditorContext` would be clean.  You could exit and the *Update* button would dissappear.
 
 ### WeatherForecast Viewer
 
@@ -1173,7 +1178,7 @@ I won't go into detail.  You can review the code in the Repo to see how it's put
 
 ## Wrap Up
 
-Much of the infrastructure I've put together here is simplistic.  The services and data records would make greater use of interfaces and core abstract classes to provide abstraction and implement boilerplate code.  A set of articles - [Building a Database Application](https://www.codeproject.com/Articles/5279560/Building-a-Database-Application-in-Blazor-Part-1-P)-  covers such a framework in more detail.  Note the current article set is based on my NetCore 3.1 4 month old Framework and will be revised over the next week.
+Much of the infrastructure I've put together here is simplistic.  The services and data records should use interfaces and core abstract classes to provide abstraction and implement boilerplate code.  A set of articles - [Building a Database Application](https://www.codeproject.com/Articles/5279560/Building-a-Database-Application-in-Blazor-Part-1-P)-  covers such a framework in more detail.  Note the current article set is based on my NetCore 3.1 four month old framework and will be revised very shortly.
 
 
-What I've covered here is a methodology for editing records.  It's not for everybody.  It depends on your mindset on data, and the environment you have to work in.  If nothing more, I hope it provokes you to question how you view and deal with data.
+What I've covered here is a methodology for editing records.  It's not for everybody.  It depends on your mindset on data, and the environment you have to work in.  If nothing more, I hope it provokes you to think about how you view and deal with data.
