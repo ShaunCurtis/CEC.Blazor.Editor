@@ -1,17 +1,17 @@
-﻿@page "/weatherdatamodal"
-@page "/editor/weatherdatamodal"
+﻿@page "/fetchdata3"
+@page "/editor/fetchdata3"
 
 @using CEC.Blazor.Editor.Data
-
-@namespace CEC.Blazor.Editor.Pages
-
-<BaseModalDialog @ref="this.Modal"></BaseModalDialog>
 
 <h1>Weather forecast</h1>
 
 <p>This component demonstrates fetching data from a service.</p>
 
-@if (this.ForecastService.Forecasts == null)
+<NavigationController @ref="this.NavController" Cascade="true" Transparent="false">
+    <WeatherPageEditor @ref="this._Editor"></WeatherPageEditor>
+</NavigationController>
+
+@if (forecasts == null)
 {
     <p><em>Loading...</em></p>
 }
@@ -27,19 +27,18 @@ else
             </tr>
         </thead>
         <tbody>
-            @foreach (var forecast in this.ForecastService.Forecasts)
+            @foreach (var forecast in forecasts)
             {
                 <tr>
                     <td>@forecast.Date.ToShortDateString()</td>
                     <td>@forecast.TemperatureC</td>
                     <td>@forecast.TemperatureF</td>
                     <td>@forecast.Summary</td>
-                    <td class="text-right">
-                        <button class="btn btn-sm btn-secondary" @onclick="() => ShowViewDialog(forecast.ID)">View</button>
-                        <button class="btn btn-sm btn-primary" @onclick="() => ShowEditDialog(forecast.ID)">Edit</button>
-                    </td>
+                    <td><button class="btn btn-secondary" @onclick="() => GoToEditor()">Editor</button></td>
+                    <td><button class="btn btn-primary" @onclick="() => ShowEditor()">Edit In Page</button></td>
                 </tr>
             }
         </tbody>
     </table>
 }
+

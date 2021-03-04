@@ -8,7 +8,7 @@ namespace CEC.Blazor.ModalEditor
     {
         private bool HasServices => this.Modal != null && this.ControllerService != null;
 
-        [Inject] protected WeatherForecastControllerService ControllerService { get; set; }
+        [Inject] protected ModalEditorWeatherForecastControllerService ControllerService { get; set; }
 
         private bool IsLoaded => this.ControllerService != null && this.ControllerService.Forecast != null;
         

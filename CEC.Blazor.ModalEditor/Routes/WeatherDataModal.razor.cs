@@ -2,11 +2,11 @@
 using System;
 using System.Threading.Tasks;
 
-namespace CEC.Blazor.Editor.Pages
+namespace CEC.Blazor.ModalEditor.Routes
 {
     public partial class WeatherDataModal : ComponentBase
     {
-        [Inject] EditorWeatherForecastControllerService ForecastService { get; set; }
+        [Inject] ModalEditorWeatherForecastControllerService ForecastService { get; set; }
 
         private BaseModalDialog Modal { get; set; }
 

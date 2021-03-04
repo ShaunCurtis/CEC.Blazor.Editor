@@ -8,17 +8,22 @@
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
     <ul class="nav flex-column">
         <li class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+            <NavLink class="nav-link" href="/hydra" Match="NavLinkMatch.All">
+                <span class="oi oi-home" aria-hidden="true"></span> Base Site Home
+            </NavLink>
+        </li>
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="/modaleditor/index" Match="NavLinkMatch.All">
                 <span class="oi oi-home" aria-hidden="true"></span> Home
             </NavLink>
         </li>
         <li class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
+            <NavLink class="nav-link" href="/modaleditor/counter">
                 <span class="oi oi-plus" aria-hidden="true"></span> Counter
             </NavLink>
         </li>
         <li class="nav-item px-3">
-            <NavLink class="nav-link" href="weatherdatamodal">
+            <NavLink class="nav-link" href="/modaleditor/weatherdatamodal">
                 <span class="oi oi-list-rich" aria-hidden="true"></span> Weather Data
             </NavLink>
         </li>

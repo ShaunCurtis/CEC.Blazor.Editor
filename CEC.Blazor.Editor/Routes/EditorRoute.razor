@@ -1,0 +1,24 @@
+﻿@page "/weditor"
+@page "/modal/weditor"
+
+<NavigationController Cascade="true">
+    <WeatherPageEditor @ref="this._Editor" CloseAction="Exit"></WeatherPageEditor>
+</NavigationController>
+
+@code {
+
+    [Inject] NavigationManager NavManager { get; set; }
+
+    private WeatherPageEditor _Editor { get; set; }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+            this._Editor.Show();
+        base.OnAfterRender(firstRender);
+    }
+
+    private void Exit()
+        => NavManager.NavigateTo("/editor/fetchdata3");
+
+}

@@ -14,7 +14,7 @@ namespace CEC.Blazor.ModalEditor
 
         protected WeatherForecastEditContext RecordEditorContext { get; set; }
 
-        [Inject] protected WeatherForecastControllerService ControllerService { get; set; }
+        [Inject] protected ModalEditorWeatherForecastControllerService ControllerService { get; set; }
 
         [CascadingParameter] private IModalDialog Modal { get; set; }
         

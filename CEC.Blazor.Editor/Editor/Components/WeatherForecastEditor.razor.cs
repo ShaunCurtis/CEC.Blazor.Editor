@@ -13,7 +13,7 @@ namespace CEC.Blazor.Editor
 
         protected WeatherForecastEditContext RecordEditorContext { get; set; }
 
-        [Inject] protected WeatherForecastControllerService ControllerService { get; set; }
+        [Inject] protected EditorWeatherForecastControllerService ControllerService { get; set; }
 
         [CascadingParameter] private IModalDialog Modal { get; set; }
         
