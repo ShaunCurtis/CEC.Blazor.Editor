@@ -385,6 +385,6 @@ Code again is pretty standard fare.
 
 ## Wrap Up
 
-This solution useds the basic methodology used by modal dialogs in placing a barrier between the controls on the page and the contents on the control.  `Lock` inserts than barrier and `Unlock` removes it.  We add the Javascript Interop to turn on add off the `beforeunload` event on the browser.
+This solution uses the basic methodology used by modal dialogs in placing a barrier between the controls on the page and the contents on the control.  `Lock` inserts than barrier and `Unlock` removes it.  We add the Javascript Interop to turn on add off the `beforeunload` event on the browser.
 
 To sum up. The best solutions are often the simplest!  
